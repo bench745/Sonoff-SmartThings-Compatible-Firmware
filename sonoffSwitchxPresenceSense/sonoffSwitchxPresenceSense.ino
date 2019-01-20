@@ -9,6 +9,7 @@
 #include <ESP8266WiFi.h>          // ESP8266 Core WiFi Library (you most likely already have this in your sketch)
 #include <DNSServer.h>            // Local DNS Server used for redirecting all requests to the configuration portal
 #include <ESP8266WebServer.h>     // Local WebServer used to serve the configuration portal
+#include <ESP8266SSDP.h>          // used for service advertisements
 #include <ESP8266HTTPClient.h>    // used for posting data to smart things
 #include <WiFiManager.h>          // WiFi Configuration
 #include <Pinger.h>               // easy pinging
@@ -20,7 +21,7 @@ extern "C"
 }
 
 // the smarthings IP, hard coding will be replaced with ssdp advertisment method of procurement
-String smartThings = "http://192.168.1.119:39500";
+String smartThings = "none";
 
 // the pin defintions
 int button = 0;
@@ -89,11 +90,11 @@ String buildJSON(){
 
  JSON += "\"config\": {\"relay\": \"";
  JSON.concat(relayState);
- JSON += "\", \"frequency\": ";
+ JSON += "\", \"frequency\": \"";
  JSON.concat(frequency);
- JSON += "\", \"hysterisis\": ";
+ JSON += "\", \"hysterisis\": \"";
  JSON.concat(hysterisis);
- JSON += "\", \"mode\": ";
+ JSON += "\", \"mode\": \"";
  JSON.concat(reportMode);
  JSON += "\"}}";
 
@@ -157,6 +158,19 @@ void load(){
 
 //////////////////////////////////////////////////////////////
 // http handlers
+
+void relayOpen(){
+  digitalWrite(relay, LOW);
+  relayState = 0;
+  server.send(200, "text/plain", "OK");
+}
+
+void relayClose(){
+  digitalWrite(relay, HIGH);
+  relayState = 1;
+  server.send(200, "text/plain", "OK");
+}
+
 
 void newSens(){
   // add a new state sensor
@@ -258,6 +272,13 @@ void setmode(){
 }
 
 
+void STaddr(){
+  smartThings = "http://" + server.arg("ip");
+  smartThings += ":";
+  smartThings += server.arg("port");
+  server.send(200, "text/plain", "OK");
+}
+
 
 //////////////////////////////////////////////////////////////
 // IO functions
@@ -302,19 +323,24 @@ void sense(){
   if (changed and reportMode == 1){
     restReport();
   } else if (reportMode == 0){
-    report();
+    restReport();
   }
 }
 
 void restReport(){
   // report all the data with out request 
-  HTTPClient http;
-  http.begin(smartThings);
-  http.addHeader("Content-Type", "application/json");
-  int code = http.POST(buildJSON());
-  http.end();
+  if (smartThings != "none"){
+    HTTPClient http;
+    http.begin(smartThings);
+    http.addHeader("Content-Type", "application/json");
+    int code = http.POST(buildJSON());
+    http.end();
+  }
 }
 
+
+//////////////////////////////////////////////////////////////
+// main functions
 
 void setup() {
   // set pins
@@ -363,16 +389,35 @@ void setup() {
   }
 
   // setup the server for the presence sensor and relay control API 
+  server.on("/on", relayClose);  // relay control
+  server.on("/off", relayOpen);
   server.on("/new", newSens);  // add a new presence sensor
   server.on("/force", forcestate);  // force a state for a given sensor
   server.on("/report", report);  // report the current presence state
   server.on("/reset", factoryreset);  // factoy reset the module, require a password?
   server.on("/mode", setmode);  // allow a choice of periodic reports, or of reports only upon a change, allow the config of a minimum time disconected before a device is considered disconnected, allow configuartion of a delay between checks 
+  server.on("/addr", STaddr);  // allow the congfig of an address to report to
   server.on("/", report);
+  
+  // setup the server for SSDP
+  server.on("/description.xml", HTTP_GET, []() {SSDP.schema(server.client());});
+
+  // setup the server for 404 page not found
   server.onNotFound([](){
     server.send(404, "text/plain", "PAGE NOT FOUND");
   });
 
+  //setup the SSDP details
+  SSDP.setSchemaURL("description.xml");
+  SSDP.setHTTPPort(80);
+  SSDP.setName("Sonoff");
+  SSDP.setSerialNumber(ESP.getChipId());
+  SSDP.setURL("index.html");
+  SSDP.setModelName("Sonoff Compound");
+  SSDP.setModelNumber("Sonoff_SL");
+  SSDP.setModelURL("http://smartlife.tech");
+  SSDP.setManufacturer("Smart Life Automated");
+  SSDP.setManufacturerURL("http://smartlife.tech");
 
   // setup the pinger call backs
   pinger.OnReceive([](const PingerResponse& response){
@@ -397,8 +442,9 @@ void setup() {
     
     return true;
   });
-  
-  
+
+  server.begin();
+  SSDP.begin();
 }
 
 
