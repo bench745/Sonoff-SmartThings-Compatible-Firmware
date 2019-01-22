@@ -1,7 +1,7 @@
 # Sonoff-SmartThings-Compatible-Firmware
 Firmware for the sonoff basic r2 that adds presence sensing capability and the possibility of SmartThings connectivity
 
-DOESN'T WORK IN CURRENT FORM, UNDER DEV
+UNDER DEV, variable persistance untested
 
 NOTE:   This firmware is written for the Sonoff Basic R2. The R2 uses ean ESP8285 and has different pin definitions compared to the R1.
 	This code needs to have its pin defintions modified and be compilied for the R1's esp chip, to be compatible with the 
