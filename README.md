@@ -18,12 +18,12 @@ If the portol times out the sonoff will flash once.
 
 The device will now begin SSDP advertisements.
 
-Now you can use the onboard button. A short press (< 3 secs) will toggle the relay and a long press (> 3 secs) will reset the devices 
+Now you can use the onboard button. A short press (\< 3 secs) will toggle the relay and a long press (\> 3 secs) will reset the devices 
 WiFi settings.  
 
 To use the devices full funtionality you must interact with a HTTP based API.
 To access the devices API you must use a URL in the form:
-http://deviceip/<command and arguments>
+http://deviceip/\<command and arguments\>
 
 The commands are as follows:
 
@@ -33,19 +33,19 @@ The commands are as follows:
 
   /off - lowers the relay pin to low (opens the relay)
 
-  /new?name=<name of person to assosiate with device>&hostname=<the hostname or ip address of there main device> - adds a new sensor
+  /new?name=\<name of person to assosiate with device\>&hostname=\<the hostname or ip address of there main device\> - adds a new sensor
 
-  /force?name=<name of person to assosiate with device>&state=<the new state> - forces a sensor to a particular state, the state can 
+  /force?name=\<name of person assosiated with device\>&state=\<the new state\> - forces a sensor to a particular state, the state can 
 	be 1, 0, true or false
 
   /report - gets a report in JSON form
 
   /reset - factory resets the device, erases ALL configuration
 
-  /mode?mode=<0 or 1>&freq=<time between checks in secs>&hyst=<no of checks before a person is reported to be absent> - sets the 
+  /mode?mode=\<0 or 1\>&freq=\<time between checks in secs\>&hyst=\<no of checks before a person is reported to be absent\> - sets the 
 	report mode; 0 is every check, 1 is only on changes
 
-  /addr?ip=<IP address>&port=<port number> - configures the address that reports will be sent to. &ip=none&port=none will disable 
+  /addr?ip=\<IP address\>&port=\<port number\> - configures the address that reports will be sent to. &ip=none&port=none will disable 
   reports, disabled by default
 
 To setup the device properly I suggest the following steps:
