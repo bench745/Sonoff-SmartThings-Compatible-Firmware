@@ -23,7 +23,7 @@ WiFi settings.
 
 To use the devices full funtionality you must interact with a HTTP based API.
 To access the devices API you must use a URL in the form:
-http://deviceip/\<command and arguments\>
+http://deviceip/ \<command and arguments\>
 
 The commands are as follows:
 
