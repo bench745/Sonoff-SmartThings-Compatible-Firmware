@@ -53,7 +53,7 @@ The commands are as follows:
   factory resets the device, erases ALL configuration
 
   ```/mode?mode=<0 or 1>&freq=<time between checks in secs>&hyst=<no of checks before a person is reported to be absent>&btn=<1 or 0,1 gives direct control of the relay to the button, 0 doesnt>``` \
-  sets the report mode; 0 is every check, 1 is only on changes
+  sets the report mode; 0 is every check, 1 is only on changes, along with other configuration options for instance check frequency,   	  hysterisis and button configuration.
 
   ```/addr?ip=<IP address>&port=<port number>``` \
   configures the address that reports will be sent to. &ip=none&port=none will disable reports, disabled by default
@@ -71,3 +71,33 @@ To setup the device properly I suggest the following steps:
 1. add each presence sensor with /new, run the command for each new sensor
 2. set the unsolicited report address with /addr
 3. set the report mode with /mode
+
+### Message Format ###
+
+Naturaly the device will send messages. All of these messages are sent using HTTP, the method with which they are sent depends on weather they are solicited or not.
+
+Solicited responses are responses to user commands, they are sent as answers to the HTTP requests that make up the commands. Where as unsolicited responses are sent when an event occurs, they are sent via a HTTP post request to IP address and port number configured in the /addr command.
+
+```JSON
+{"OK":"<0 indicating false, or 1 indicating true>", "cmd":"<command sent - for example 'new' or 'on'>"}
+```
+This  is sent to idicate the success or failure of a command. 
+
+```JSON
+{"sensor0":{
+	"name":"<the name assosciated with the sensor>",
+	"hostName":"<the hostname or IP address of the device the sensor looks for>",
+	"state":"<in or out, depending on the prsenceof the device>"},
+ "config":{
+ 	"relay":"<1 or 0, 1 indicates relay is closed and 0 indicates the relay is open>",
+	"frequency":"<the nuber of seconds between each report>",
+	"hysterisis":"<the number of checks that each person must fail to report before absence in confirmed>",
+	"mode":"<1 or 0, 1 indicates report only one state change and 0 indicates a report per check>"}
+}
+```
+This is sent upon the request for a report, when a report is triggered by a state change or simply a check.
+
+```JSON
+{"button":"<up or dwn>"}
+```
+This is sent when a button event occurs on the board, it is only ever unsolicited.
