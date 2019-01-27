@@ -37,6 +37,7 @@ char ssid[19]= "sonoff";
 unsigned int frequency = 180;  // the number of seconds between presence checks
 unsigned short hysterisis = 2;  // the minimum number of cyles someone unaccounted for before a sensor is given the absent value
 int reportMode = 0;  // 0 - report on every check, 1 - report only when a presence state changes
+int btnToRelay = 1;  // 0 - button doesnt directly control relay, 1 - button does control relay
 
 const unsigned short maxNumberOfSensors = 32;  // the maximum number of sensors
 unsigned short used = 0;  // record the number of allocated sensors
@@ -143,6 +144,45 @@ void load(){
 
 //////////////////////////////////////////////////////////////
 // http handlers
+
+void clearSensors(){
+  used = 0;  // record the number of allocated sensors
+  names[maxNumberOfSensors][11] = {};  // the names assosiated with each sensor max len 10 chars
+  hostnm[maxNumberOfSensors][25] = {};  // the the host names associated with each sensor in the form of a char array 
+  states[maxNumberOfSensors] = {};  // the state of each sensor. true - present, false - absent
+  dynamicStates[maxNumberOfSensors] = {};  // the dynamic states of the presence accurate at the current time, only transfered to states after the hysterisis period is complete
+  timeUnaccounted[maxNumberOfSensors] = {};  // record the time that a presence indicatior has been unaccounted for
+
+  erase();
+  server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"clear\"}");
+}
+
+
+void ledCtrl(){
+  if (server.arg("state") == "1"){
+    digitalWrite(led, LOW);
+    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led\"}");
+  }else if(server.arg("state") == "0"){
+    digitalWrite(led, HIGH);
+    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led\"}");
+  } else {
+    server.send(200, "application/json", "{\"OK\":\"0\",\"cmd\":\"led\"}");
+  }
+}
+
+
+void gpioCtrl(){
+  if (server.arg("state") == "1"){
+    digitalWrite(gpio, HIGH);
+    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gpio\"}");
+  }else if(server.arg("state") == "0"){
+    digitalWrite(gpio, LOW);
+    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gpio\"}");
+  } else {
+    server.send(200, "application/json", "{\"OK\":\"0\",\"cmd\":\"gpio\"}");
+  }
+}
+
 
 void relayOpen(){
   Serial.println("opening relay");
@@ -265,7 +305,14 @@ void setmode(){
       char buf[server.arg(i).length() + 1];
       server.arg(i).toCharArray(buf, sizeof(buf));
       hysterisis = atoi(buf);
+    } else if (server.argName(i) == "btn"){
+      if (server.arg(i) == "1"){
+        btnToRelay = 1;
+      }else if (server.arg(i) == "0"){
+        btnToRelay = 0;
+      }
     }
+    
   }
   save();
 
@@ -324,7 +371,7 @@ void sense(){
       Serial.print(names[i]);
       Serial.println(" is not responding");
       
-      if (timeUnaccounted[i] >= hysterisis and states[i] == true){
+      if (timeUnaccounted[i] >= (hysterisis + 1) and states[i] == true){
         states[i] = false;
         changed = true; 
         
@@ -337,13 +384,13 @@ void sense(){
 
   // report when nessisary
   if (changed and reportMode == 1){
-    restReport();
+    restReport(buildJSON());
   } else if (reportMode == 0){
-    restReport();
+    restReport(buildJSON());
   }
 }
 
-void restReport(){
+void restReport(String data){
   // report all the data with out request 
   
   if (smartThings != "http://none:none"){
@@ -351,7 +398,7 @@ void restReport(){
     HTTPClient http;
     http.begin(smartThings);
     http.addHeader("Content-Type", "application/json");
-    int code = http.POST(buildJSON());
+    int code = http.POST(data);
     http.end();
   }
 }
@@ -426,6 +473,9 @@ void setup() {
   server.on("/reset", factoryreset);  // factoy reset the module, require a password?
   server.on("/mode", setmode);  // allow a choice of periodic reports, or of reports only upon a change, allow the config of a minimum time disconected before a device is considered disconnected, allow configuartion of a delay between checks 
   server.on("/addr", STaddr);  // allow the congfig of an address to report to
+  server.on("/clear", clearSensors);  // clear all of the sensors
+  server.on("/led", ledCtrl);  // change the state of the led
+  server.on("/gpio", gpioCtrl);  // change the stste of the GPIO pin
   server.on("/", report);
   
   // setup the server for SSDP
@@ -473,16 +523,21 @@ void loop() {
   if (state == HIGH and recording == false){  // if the buttoin has been pressed
     dwn = millis();  // the time that the button was last pressed
     recording = true;
+    restReport("{\"button\":\"dwn\"}");
   }else if (state == LOW and recording == true){  // if the button has been released
     unsigned long up = millis();
     recording = false;
+    restReport("{\"button\":\"up\"}");
 
-    if ((up - dwn) < 3000){  // if the press was less than 3 seconds, and therefore deemed short
+    if ((up - dwn) < 4500){  // if the press was less than 4.5 seconds, and therefore deemed short
       // toggle the relay
       Serial.println("short press");
-      digitalWrite(relay, !relayState);
-      relayState = !relayState;
-      restReport();
+      restReport(buildJSON());
+
+      if (btnToRelay == 1){
+        digitalWrite(relay, !relayState);
+        relayState = !relayState;
+      }
     }
     else {
       // launch the longPress funct, normaly opens the config AP
