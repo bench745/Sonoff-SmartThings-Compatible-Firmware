@@ -55,7 +55,7 @@ ESP8266WebServer server(80);
 // data utility fuctions
 
 String buildJSON(){
-  String JSON = "{";
+  String JSON = "{\"sensors\":{";
   for (int i = 0; i < used; i++){
     JSON += "\"sensor";
     JSON.concat(i);
@@ -65,7 +65,8 @@ String buildJSON(){
     JSON.concat(hostnm[i]);
     JSON += "\", \"state\": \"";
     (states[i]) ? (JSON += "in") : (JSON += "out");
-    JSON += "\"}, ";
+    JSON += "\"}";
+    (i < (used -1)) ? (JSON += ", ") : (JSON += "} "); 
   }
 
  JSON += "\"config\": {\"relay\": \"";
@@ -76,6 +77,8 @@ String buildJSON(){
  JSON.concat(hysterisis);
  JSON += "\", \"mode\": \"";
  JSON.concat(reportMode);
+ JSON += "\", \"directbuttoncontrol\": \"";
+ JSON.concat(btnToRelay);
  JSON += "\"}}";
 
  return JSON; 
@@ -108,6 +111,8 @@ void save(){
   EEPROM.put(addr, hostnm);
   addr += sizeof(hostnm);
   EEPROM.put(addr, reportMode);
+  addr += sizeof(reportMode);
+  EEPROM.put(addr, btnToRelay);
 }
 
 
@@ -135,6 +140,8 @@ void load(){
   EEPROM.get(addr, hostnm);
   addr += sizeof(hostnm);
   EEPROM.get(addr, reportMode);
+  addr += sizeof(reportMode);
+  EEPROM.get(addr, btnToRelay);
 
   for (int i = 0; i < used; i++){
     states[i] = false;
