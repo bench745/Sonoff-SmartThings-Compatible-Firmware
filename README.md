@@ -78,11 +78,13 @@ Naturaly the device will send messages. All of these messages are sent using HTT
 
 Solicited responses are responses to user commands, they are sent as answers to the HTTP requests that make up the commands. Where as unsolicited responses are sent when an event occurs, they are sent via a HTTP post request to IP address and port number configured in the /addr command.
 
+**Command Success Message**
 ```JSON
 {"OK":"<0 indicating false, or 1 indicating true>", "cmd":"<command sent - for example 'new' or 'on'>"}
 ```
-This  is sent to idicate the success or failure of a command. 
+This is sent to idicate the success or failure of a command. 
 
+**Report Message**
 ```JSON
 {
 "sensors":{
@@ -105,6 +107,7 @@ This  is sent to idicate the success or failure of a command.
 ```
 This is sent upon the request for a report, when a report is triggered by a state change or simply a check. Each active sensor will be listed.
 
+**Button Event Message**
 ```JSON
 {"button":"<up or dwn>"}
 ```
