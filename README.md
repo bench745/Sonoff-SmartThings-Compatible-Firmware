@@ -7,6 +7,8 @@ NOTE:   This firmware is written for the Sonoff Basic R2. The R2 uses an ESP8285
 	This code needs to have its pin defintions modified and be compilied for the R1's esp chip, to be compatible with the 
 	Sonoff R1 basic.
 
+###Setup###
+
 To flash the sonoff basic r2, power it on while holding the button and the flash the firmware. Whether you are using the arduino IDE, 
 esptool.py or some other flashing tool ensure that you have configured your tool for flashing an ESP8285.
 
@@ -20,6 +22,8 @@ The device will now begin SSDP advertisements.
 
 Now you can use the onboard button. A short press (\< 3 secs) will toggle the relay and a long press (\> 3 secs) will reset the devices 
 WiFi settings.  
+
+###Rest API Commands###
 
 To use the devices full funtionality you must interact with a HTTP based API.
 To access the devices API you must use a URL in the form:
