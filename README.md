@@ -84,15 +84,27 @@ Solicited responses are responses to user commands, they are sent as answers to 
 This  is sent to idicate the success or failure of a command. 
 
 ```JSON
-{"sensor0":{
-	"name":"<the name assosciated with the sensor>",
-	"hostName":"<the hostname or IP address of the device the sensor looks for>",
-	"state":"<in or out, depending on the prsenceof the device>"},
- "config":{
+{
+"sensors":{
+	"sensor0":{
+		"name":"<the name assosciated with the sensor>",
+		"hostName":"<the hostname or IP address of the device the sensor looks for>",
+		"state":"<in or out, depending on the prsenceof the device>"},
+	"sensor1":{
+		"name":"<the name assosciated with the sensor>",
+		"hostName":"<the hostname or IP address of the device the sensor looks for>",
+		"state":"<in or out, depending on the prsenceof the device>"},
+	<...>
+	"sensorN":{
+		<sensor feilds>}
+	}
+},
+"config":{
  	"relay":"<1 or 0, 1 indicates relay is closed and 0 indicates the relay is open>",
 	"frequency":"<the nuber of seconds between each report>",
 	"hysterisis":"<the number of checks that each person must fail to report before absence in confirmed>",
-	"mode":"<1 or 0, 1 indicates report only one state change and 0 indicates a report per check>"}
+	"mode":"<1 or 0, 1 indicates report only one state change and 0 indicates a report per check>",
+	"directbuttoncontrol":"<1 or 0, 1 indicates that the onboard button directly controls the relay>"}
 }
 ```
 This is sent upon the request for a report, when a report is triggered by a state change or simply a check.
