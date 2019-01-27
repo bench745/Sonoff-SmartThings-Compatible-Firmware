@@ -27,31 +27,41 @@ http://deviceip/ \<command and arguments\>
 
 The commands are as follows:
 
-  / - gets a report in JSON form
+  ```/``` \
+  gets a report in JSON form
 
-  /on - raises the relay pin high (closes the relay)
+  ```/on``` \
+  raises the relay pin high (closes the relay)
 
-  /off - lowers the relay pin to low (opens the relay)
+  ```/off``` \
+  lowers the relay pin to low (opens the relay)
 
-  /new?name=\<name of person to assosiate with device\>&hostname=\<the hostname or ip address of there main device\> - adds a new sensor
+  ```/new?name=<name of person to assosiate with device>&hostname=<the hostname or ip address of there main device>``` \
+  adds a new sensor
 
-  /force?name=\<name of person assosiated with device\>&state=\<the new state\> - forces a sensor to a particular state, the state can 
-	be 1, 0, true or false
+  ```/force?name=<name of person assosiated with device>&state=<the new state>``` \
+  forces a sensor to a particular state, the state can be 1, 0, true or false
 
-  /report - gets a report in JSON form
+  ```/report``` \
+  gets a report in JSON form
 
-  /reset - factory resets the device, erases ALL configuration
+  ```/reset``` \
+  factory resets the device, erases ALL configuration
 
-  /mode?mode=\<0 or 1\>&freq=\<time between checks in secs\>&hyst=\<no of checks before a person is reported to be absent\>&btn=\<1 or 0,1 gives direct control of the relay to the button, 0 doesnt\> - sets the report mode; 0 is every check, 1 is only on changes
+  ```/mode?mode=<0 or 1>&freq=<time between checks in secs>&hyst=<no of checks before a person is reported to be absent>&btn=<1 or 0,1 gives direct control of the relay to the button, 0 doesnt>``` \
+  sets the report mode; 0 is every check, 1 is only on changes
 
-  /addr?ip=\<IP address\>&port=\<port number\> - configures the address that reports will be sent to. &ip=none&port=none will disable 
-  reports, disabled by default
+  ```/addr?ip=<IP address>&port=<port number>``` \
+  configures the address that reports will be sent to. &ip=none&port=none will disable reports, disabled by default
   
-  /clear - deletes all the current presence sensors
+  ```/clear``` \
+  deletes all the current presence sensors
   
-  /gpio?state=\<1 for high, 0 for low\> - switch the broken out GPIO pin
+  ```/gpio?state=<1 for high, 0 for low>``` \
+  switch the broken out GPIO pin
   
-  /led?state=\<1 for on, 0 for off\> - turn on and off the onborad led
+  ```/led?state=<1 for on, 0 for off>``` \
+  turn on and off the onborad led
 
 To setup the device properly I suggest the following steps:
 1. add each presence sensor with /new, run the command for each new sensor
