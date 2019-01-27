@@ -93,11 +93,7 @@ This  is sent to idicate the success or failure of a command.
 	"sensor1":{
 		"name":"<the name assosciated with the sensor>",
 		"hostName":"<the hostname or IP address of the device the sensor looks for>",
-		"state":"<in or out, depending on the prsenceof the device>"},
-	<...>
-	"sensorN":{
-		<sensor feilds>}
-	}
+		"state":"<in or out, depending on the prsenceof the device>"}
 },
 "config":{
  	"relay":"<1 or 0, 1 indicates relay is closed and 0 indicates the relay is open>",
@@ -107,7 +103,7 @@ This  is sent to idicate the success or failure of a command.
 	"directbuttoncontrol":"<1 or 0, 1 indicates that the onboard button directly controls the relay>"}
 }
 ```
-This is sent upon the request for a report, when a report is triggered by a state change or simply a check.
+This is sent upon the request for a report, when a report is triggered by a state change or simply a check. Each active sensor will be listed.
 
 ```JSON
 {"button":"<up or dwn>"}
