@@ -66,18 +66,18 @@ String buildJSON(){
     JSON += "\", \"state\": \"";
     (states[i]) ? (JSON += "in") : (JSON += "out");
     JSON += "\"}";
-    (i < (used -1)) ? (JSON += ", ") : (JSON += "} "); 
+    (i < (used -1)) ? (JSON += ", ") : (JSON += "}, "); 
   }
 
  JSON += "\"config\": {\"relay\": \"";
  JSON.concat(relayState);
- JSON += "\", \"frequency\": \"";
+ JSON += "\", \"freq\": \"";
  JSON.concat(frequency);
- JSON += "\", \"hysterisis\": \"";
+ JSON += "\", \"hyst\": \"";
  JSON.concat(hysterisis);
  JSON += "\", \"mode\": \"";
  JSON.concat(reportMode);
- JSON += "\", \"directbuttoncontrol\": \"";
+ JSON += "\", \"btn\": \"";
  JSON.concat(btnToRelay);
  JSON += "\"}}";
 
