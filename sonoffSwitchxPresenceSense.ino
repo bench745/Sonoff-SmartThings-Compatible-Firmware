@@ -24,10 +24,10 @@ extern "C"
 String smartThings = "http://none:none";
 
 // the pin defintions
-int button = 0;
-int gpio = 2;
-int relay = 12;
-int led = 13;
+const int button = 0;
+const int gpio = 2;
+const int relay = 12;
+const int led = 13;
 
 // global variables
 bool recording = false;  // false indicates that the esp is not timing a button press 
@@ -55,7 +55,8 @@ ESP8266WebServer server(80);
 // data utility fuctions
 
 String buildJSON(){
-  String JSON = "{\"sensors\":{";
+  String JSON = "";
+  (used > 0) ? (JSON += "{\"sensors\":{") : ("{");
   for (int i = 0; i < used; i++){
     JSON += "\"sensor";
     JSON.concat(i);
@@ -166,27 +167,35 @@ void clearSensors(){
 
 
 void ledCtrl(){
-  if (server.arg("state") == "1"){
-    digitalWrite(led, LOW);
-    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led\"}");
-  }else if(server.arg("state") == "0"){
-    digitalWrite(led, HIGH);
-    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led\"}");
-  } else {
-    server.send(200, "application/json", "{\"OK\":\"0\",\"cmd\":\"led\"}");
+  for (int i = 0; i < server.args(); i++){
+    if (server.argName(i) == "state" and server.arg(i) == "1"){
+      digitalWrite(led, LOW);
+      Serial.print("turning on LED (");
+      Serial.print(led);
+      Serial.println(")");
+      server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led on\"}");
+    }else if(server.argName(i) == "state" and server.arg(i) == "0"){
+      digitalWrite(led, HIGH);
+      Serial.print("turning off LED (");
+      Serial.print(led);
+      Serial.println(")");
+      server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"led off\"}");
+    }
   }
 }
 
 
 void gpioCtrl(){
-  if (server.arg("state") == "1"){
-    digitalWrite(gpio, HIGH);
-    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gpio\"}");
-  }else if(server.arg("state") == "0"){
-    digitalWrite(gpio, LOW);
-    server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gpio\"}");
-  } else {
-    server.send(200, "application/json", "{\"OK\":\"0\",\"cmd\":\"gpio\"}");
+  for (int i = 0; i < server.args(); i++){
+    if (server.argName(i) == "state" and server.arg(i) == "1"){
+      digitalWrite(led, HIGH);
+      Serial.println("turning on GPIO");
+      server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gipo on\"}");
+    }else if(server.argName(i) == "state" and server.arg(i) == "0"){
+      digitalWrite(led, LOW);
+      Serial.println("turning off GPIO");
+      server.send(200, "application/json", "{\"OK\":\"1\",\"cmd\":\"gipo off\"}");
+    }
   }
 }
 
@@ -527,19 +536,29 @@ void loop() {
   
   int state = digitalRead(button);
   
-  if (state == HIGH and recording == false){  // if the buttoin has been pressed
+  if (state == LOW and recording == false){  // if the buttoin has been pressed
     dwn = millis();  // the time that the button was last pressed
     recording = true;
     restReport("{\"button\":\"dwn\"}");
-  }else if (state == LOW and recording == true){  // if the button has been released
+    
+    Serial.println("btn dwn");
+    
+  }else if (state == HIGH and recording == true){  // if the button has been released
     unsigned long up = millis();
     recording = false;
     restReport("{\"button\":\"up\"}");
 
+    Serial.print("btn up: ");
+    Serial.print(up);
+    Serial.print(", ");
+    Serial.print(dwn);
+    Serial.print(": ");
+    Serial.println(up - dwn);
+
     if ((up - dwn) < 4500){  // if the press was less than 4.5 seconds, and therefore deemed short
       // toggle the relay
       Serial.println("short press");
-      restReport(buildJSON());
+      //restReport(buildJSON());
 
       if (btnToRelay == 1){
         digitalWrite(relay, !relayState);
