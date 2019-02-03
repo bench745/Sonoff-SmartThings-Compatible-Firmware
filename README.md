@@ -99,7 +99,7 @@ This is sent to idicate the success or failure of a command.
 },
 "config":{
  	"relay":"<1 or 0, 1 indicates relay is closed and 0 indicates the relay is open>",
-	"freq":"<the nuber of seconds between each report>",
+	"freq":"<the number of seconds between each report>",
 	"hyst":"<the number of checks that each person must fail to report before absence in confirmed>",
 	"mode":"<1 or 0, 1 indicates report only one state change and 0 indicates a report per check>",
 	"btn":"<1 or 0, 1 indicates that the onboard button directly controls the relay>"}
