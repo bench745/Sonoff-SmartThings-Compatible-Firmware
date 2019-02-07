@@ -368,6 +368,8 @@ void sense(){
   bool changed = false;  // have we changed states on this check
   
   for (int i = 0; i < used; i++){
+    server.handleClient();
+    
     bool in = Ping.ping(hostnm[i]);
     
     if (in == true and states[i] == false){  // if they've registed in and if they were out 
