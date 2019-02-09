@@ -56,7 +56,7 @@ ESP8266WebServer server(80);
 
 String buildJSON(){
   String JSON = "";
-  (used > 0) ? (JSON += "{\"sensors\":{") : ("{");
+  (used > 0) ? (JSON += "{\"sensors\":{") : (JSON += "{");
   for (int i = 0; i < used; i++){
     JSON += "\"sensor";
     JSON.concat(i);
