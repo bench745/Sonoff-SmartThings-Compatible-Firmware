@@ -557,7 +557,7 @@ void loop() {
     Serial.print(": ");
     Serial.println(up - dwn);
 
-    if ((up - dwn) < 4500){  // if the press was less than 4.5 seconds, and therefore deemed short
+    if ((up - dwn) < 50000){  // if the press was less than some amount of seconds, and therefore deemed short
       // toggle the relay
       Serial.println("short press");
       //restReport(buildJSON());
