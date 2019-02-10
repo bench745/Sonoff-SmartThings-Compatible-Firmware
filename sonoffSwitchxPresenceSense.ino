@@ -371,6 +371,10 @@ void sense(){
     server.handleClient();
     
     bool in = Ping.ping(hostnm[i]);
+
+    Serial.print(in);
+    Serial.print(", ");
+    Serial.print(Ping.averageTime());
     
     if (in == true and states[i] == false){  // if they've registed in and if they were out 
       changed = true;
