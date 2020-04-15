@@ -40,7 +40,7 @@ The commands are as follows:
   ```/off``` \
   lowers the relay pin to low (opens the relay)
 
-  ```/new?name=<name of person to assosiate with device>&hostname=<the hostname or ip address of there main device>``` \
+  ```/new?name=<name of person to assosiate with device>&hostname=<the hostname or ip address of their main device>``` \
   adds a new sensor
 
   ```/force?name=<name of person assosiated with device>&state=<the new state>``` \
